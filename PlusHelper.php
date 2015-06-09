@@ -1,19 +1,30 @@
 <?php
 namespace App\View\Helper;
 
-use Cake\View\Helper;
+use Cake\View\Helper\FormHelper
 
-class PlusHelper extends Helper
+class PlusHelper extends FormHelper
 {
     public $helpers = ['Html','Form'];
 
-    public function input($title,array $options = null){
-      if(!isset($options)){
-        $options = array();
+    public function selectDinamic($title,array $options = null,$optionsPlus = null){
+      $options += [
+          'type' => null,
+          'label' => null,
+          'error' => null,
+          'required' => null,
+          'options' => null,
+          'templates' => [],
+      ];
+      if(isset($options["label"])){
+        $label = $this->_getLabel($title, compact('input', 'label', 'error', 'nestedInput') + $options);
+        $options["label"] = false;
       }
-      $input = $this->Form->input($title,$options);
-      $button = $this->Html->tag('button','',['type'=>'button','class'=>'glyphicon glyphicon-plus-sign btn-lg','data-toggle'=>'modal','data-target'=>"#".$title.'Modal']);
-      $input .= $button;
+      debug($options);
+      $input = $this->input($title,$options);
+      $button = $this->Html->tag('button','',['type'=>'button','class'=>'btn btn-default glyphicon glyphicon-plus-sign','data-toggle'=>'modal','data-target'=>"#".$title.'Modal']);
+      $spanGroup = $this->Html->tag("span",$button,['class'=>'input-group-btn']);
+      $divInputGroup = $this->Html->tag("div",$input.$spanGroup,['class'=>'input-group']);
 
       /* Header Modal */
       $spanCloseButton = $this->Html->tag('span','&times;',['aria-hidden'=>'true']);
@@ -23,15 +34,15 @@ class PlusHelper extends Helper
 
       /* Content Modal*/
       $body = "";
-      if(isset($options["modalBody"])){
-        $body = $options["modalBody"];
+      if(isset($optionsPlus["modalBody"])){
+        $body = $optionsPlus["modalBody"];
       }
       $modalBody = $this->Html->tag("div",$body,['class'=>'modal-body']);
 
       /* Footer Modal */
-      $optionsFooterButton = ['type'=>'button','class'=>'btn btn-primary'];
-      if(isset($options["footerButton"])){
-        $optionsFooterButton["onclick"] = $options["footerButton"];
+      $optionsFooterButton = ['type'=>'button','class'=>'btn btn-primary','data-dismiss'=>"modal"];
+      if(isset($optionsPlus["footerButton"])){
+        $optionsFooterButton["onclick"] = $optionsPlus["footerButton"];
       }
       $modalFooterCloseButton = $this->Html->tag("button",__("Close"),['type'=>'button','class'=>'btn btn-default','data-dismiss'=>'modal']);
       $modalFooterButton = $this->Html->tag("button",__("Save Changes"),$optionsFooterButton);
@@ -41,8 +52,9 @@ class PlusHelper extends Helper
       $modalDialog = $this->Html->tag('div',$modalContent,['class'=>'modal-dialog']);
       $modal = $this->Html->tag('div',$modalDialog,['class'=>'modal fade','id' => $title."Modal"]);
 
-      return $input.$modal;
+      return $label.$divInputGroup.$modal;
     }
+
 
 }
 
