@@ -1,11 +1,11 @@
 <?php
 namespace App\View\Helper;
 
-use Cake\View\Helper\FormHelper
+use Cake\View\Helper\FormHelper;
 
 class PlusHelper extends FormHelper
 {
-    public $helpers = ['Html','Form'];
+    public $helpers = ['Html'];
 
     public function selectDinamic($title,array $options = null,$optionsPlus = null){
       $options += [
@@ -20,7 +20,7 @@ class PlusHelper extends FormHelper
         $label = $this->_getLabel($title, compact('input', 'label', 'error', 'nestedInput') + $options);
         $options["label"] = false;
       }
-      debug($options);
+      $html = "";
       $input = $this->input($title,$options);
       $button = $this->Html->tag('button','',['type'=>'button','class'=>'btn btn-default glyphicon glyphicon-plus-sign','data-toggle'=>'modal','data-target'=>"#".$title.'Modal']);
       $spanGroup = $this->Html->tag("span",$button,['class'=>'input-group-btn']);
@@ -51,11 +51,20 @@ class PlusHelper extends FormHelper
       $modalContent = $this->Html->tag('div',$modalHeader.$modalBody.$modalFooter,['class'=>'modal-content']);
       $modalDialog = $this->Html->tag('div',$modalContent,['class'=>'modal-dialog']);
       $modal = $this->Html->tag('div',$modalDialog,['class'=>'modal fade','id' => $title."Modal"]);
-
-      return $label.$divInputGroup.$modal;
+      if(isset($label)){
+        $html .= $label;
+      }
+      if(isset($divInputGroup)){
+        $html .= $divInputGroup;
+      }
+      if(isset($modal)){
+        $html .= $modal;
+      }
+      return $html;
     }
 
 
 }
 
 ?>
+
